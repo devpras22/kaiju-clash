@@ -1,0 +1,22 @@
+<!doctype html><html><body style="margin:0;background:#000"><div id="game"></div>
+<script type="module">
+import * as THREE from 'three';
+import { Renderer } from '../core/Renderer.js';
+import { FX } from '../fx/FX.js';
+import { City } from './City.js';
+const renderer = new Renderer(document.getElementById('game'));
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(40, innerWidth / innerHeight, 0.5, 3000);
+const fx = new FX(scene); const city = new City(scene, renderer.renderer, fx);
+const box = new THREE.Mesh(new THREE.CapsuleGeometry(3, 7, 8, 16), new THREE.MeshStandardMaterial({ color: 0x2b3a2e, roughness: 0.7 }));
+box.position.set(-15, 6.5, 0); box.castShadow = true; scene.add(box);
+const b2 = box.clone(); b2.position.x = 15; scene.add(b2);
+const g = { renderer, scene, camera, fx, city, camPos: new THREE.Vector3(0, 13, 55), look: new THREE.Vector3(0, 8, 0) };
+window.__game = g;
+let last = performance.now();
+renderer.renderer.setAnimationLoop(() => {
+  const now = performance.now(); const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  camera.position.copy(g.camPos); camera.lookAt(g.look);
+  city.update(dt, camera); fx.update(dt, camera); renderer.render(scene, camera);
+});
+</script></body></html>
